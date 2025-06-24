@@ -35,10 +35,10 @@ pub struct GeminiRequest {
 }
 
 impl GeminiContent {
-    pub fn new(content: String) -> GeminiContent  {
+    pub fn new(role:String,content: String) -> GeminiContent  {
         let part = GeminiPart { text: content };
         GeminiContent {
-            role: "user".to_string(),
+            role,
             parts: vec![part]
         }
     }

@@ -9,7 +9,7 @@ use crate::models::general::llm::{GeminiContent, GeminiPart, GeminiResponse};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let res = helper::command_line::get_user_response("What are we building today");
-    let msg = vec![GeminiContent::new(res)];
+    let msg = vec![GeminiContent::new("user".to_string(),res)];
 
     // Call the API and handle the result
     let out = api::call_req::call_api(msg).await?;
