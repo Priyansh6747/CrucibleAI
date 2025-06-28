@@ -3,6 +3,11 @@ name = "CrucibleAI"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "backend"
+path = "src/main.rs"
+
+
 [dependencies]
 dotenv = "0.15.0"
 reqwest = {version = "0.12.20" , features = ["json"]}

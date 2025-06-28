@@ -1,0 +1,11 @@
+D:\Projects\CrucibleAI\target\debug\deps\libgemini_rust-60e4200498ca3e1b.rmeta: C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\lib.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\client.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\error.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\models.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\tools.rs
+
+D:\Projects\CrucibleAI\target\debug\deps\libgemini_rust-60e4200498ca3e1b.rlib: C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\lib.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\client.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\error.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\models.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\tools.rs
+
+D:\Projects\CrucibleAI\target\debug\deps\gemini_rust-60e4200498ca3e1b.d: C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\lib.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\client.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\error.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\models.rs C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\tools.rs
+
+C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\lib.rs:
+C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\client.rs:
+C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\error.rs:
+C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\models.rs:
+C:\Users\gs434\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\gemini-rust-0.4.2\src\tools.rs:
