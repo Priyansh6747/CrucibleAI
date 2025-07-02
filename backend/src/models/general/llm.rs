@@ -124,4 +124,13 @@ impl GeminiResponse {
 
         texts
     }
+    
+    pub fn get_string(&self) ->String {
+        let mut out:String = String::new();
+        for s in self.extract_all_texts() {
+            out.push_str(&s);
+            out.push(' ');
+        }
+        out
+    }
 }

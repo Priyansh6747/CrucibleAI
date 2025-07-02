@@ -1,7 +1,10 @@
+use std::fs;
 use reqwest::Client;
 use crate::api::call_req::call_api;
 use crate::helper::command_line::PrinCommand;
 use crate::models::general::llm::{GeminiContent, GeminiResponse};
+
+const CODE_TEMPLATE_PATH: &str = "../../../Template/ServerTemplate.rs";
 
 pub fn extend_ai_function(ai_func: fn(&str) -> &'static str, func_input: &str) -> GeminiContent {
     let ai_function_str: &str = ai_func(func_input);
@@ -39,6 +42,27 @@ pub async fn check_status_code(client:&Client,url:&str) -> Result<u16,reqwest::E
     let res:reqwest::Response = client.get(url).send().await?;
     Ok(res.status().as_u16())
 }
+
+///Get Code Template
+pub fn read_code_template_contents() -> String {
+    let path = String::from(CODE_TEMPLATE_PATH);
+    fs::read_to_string(&path).expect("Failed to read template file")
+}
+
+///Save the new Code
+pub fn write_code_main(content: &String , user: &String) {
+    let exec_main_path: &str =  &format!("../../../{}/main.rs", user);
+    let api_schema_path:&str = &format!("../../../{}/api_schema.json", user);
+    fs::write(&exec_main_path, content).expect("Failed to write main file");
+
+}
+
+///Save the JSON API Endpoint Schema
+pub fn save_api_json(api_endpoints:&String , user:&String) {
+    let api_schema_path:&str = &format!("../../../{}/api_schema.json", user);
+    fs::write(&api_schema_path, api_endpoints).expect("Failed to write api endpoints file");
+}
+
 
 
 #[cfg(test)]

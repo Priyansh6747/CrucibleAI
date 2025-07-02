@@ -2,9 +2,7 @@ mod ai_functions;
 mod api;
 mod helper;
 mod models;
-#[allow(unused)]
-use gemini_rs;
-use crate::models::general::llm::{GeminiContent, GeminiPart, GeminiResponse};
+use crate::models::general::llm::{GeminiContent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
