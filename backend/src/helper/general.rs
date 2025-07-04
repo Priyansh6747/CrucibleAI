@@ -1,5 +1,6 @@
 use std::fs;
 use reqwest::Client;
+use serde::de::DeserializeOwned;
 use crate::api::call_req::call_api;
 use crate::helper::command_line::PrinCommand;
 use crate::models::general::llm::{GeminiContent, GeminiResponse};
@@ -38,6 +39,26 @@ pub async fn ai_task_req(
     }
 }
 
+pub async fn ai_task_req_decoded<T: DeserializeOwned>(
+    msg_ctx: String,
+    agent_pos: &str,
+    agent_operation: &str,
+    fn_pass: for<'a> fn(&'a str) -> &'static str
+) -> T {
+    let Some(ai_res) = ai_task_req(msg_ctx, agent_pos, agent_operation, fn_pass)
+        .await.extract_text()
+    else {
+        panic!("LLM response did not return any text");
+    };
+
+    let decoded_res: Result<T, _> = serde_json::from_str(&ai_res);
+    let res = match decoded_res {
+        Ok(res) => res,
+        Err(_) => panic!("Failed to deserialize LLM response")
+    };
+    res
+}
+
 pub async fn check_status_code(client:&Client,url:&str) -> Result<u16,reqwest::Error> {
     let res:reqwest::Response = client.get(url).send().await?;
     Ok(res.status().as_u16())
@@ -51,15 +72,15 @@ pub fn read_code_template_contents() -> String {
 
 ///Save the new Code
 pub fn write_code_main(content: &String , user: &String) {
-    let exec_main_path: &str =  &format!("../../../{}/main.rs", user);
-    let api_schema_path:&str = &format!("../../../{}/api_schema.json", user);
+    let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
+    
     fs::write(&exec_main_path, content).expect("Failed to write main file");
 
 }
 
 ///Save the JSON API Endpoint Schema
 pub fn save_api_json(api_endpoints:&String , user:&String) {
-    let api_schema_path:&str = &format!("../../../{}/api_schema.json", user);
+    let api_schema_path:&str = &format!("../../../Out/{}/api_schema.json", user);
     fs::write(&api_schema_path, api_endpoints).expect("Failed to write api endpoints file");
 }
 
