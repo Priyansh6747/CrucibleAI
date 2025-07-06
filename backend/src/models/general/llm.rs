@@ -2,13 +2,13 @@ use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
 ///Request Bases Structures
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone ,PartialEq)]
 pub struct GeminiContent {
     pub role: String,
     pub parts: Vec<GeminiPart>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone,PartialEq)]
 pub struct GeminiPart {
     pub text: String,
 }

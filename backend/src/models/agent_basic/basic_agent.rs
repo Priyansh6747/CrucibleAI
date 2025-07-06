@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use crate::models::general::llm::GeminiContent;
 use crate::models::agent_basic::basic_traits::BasicTrait;
-#[derive(Clone,Debug,Serialize,Deserialize)]
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 pub enum AgentState {
     Discovery,
     Working,
@@ -10,7 +10,7 @@ pub enum AgentState {
 }
 
 
-#[derive(Clone,Debug,Serialize,Deserialize)]
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq)]
 pub struct BasicAgent {
     pub objective: String,
     pub position:String,
