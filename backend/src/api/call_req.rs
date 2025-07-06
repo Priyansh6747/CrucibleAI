@@ -4,7 +4,7 @@ use reqwest::Client;
 use std::env;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 
-pub async fn call_api(messages: Vec<GeminiContent>) -> Result<GeminiResponse, Box<dyn std::error::Error>> {
+pub async fn call_api(messages: Vec<GeminiContent>) -> Result<GeminiResponse, Box<dyn std::error::Error + Send + Sync>> {
     dotenv().ok();
     let api_key = env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY not set");
     let model = env::var("GEMINI_MODEL").expect("GEMINI_MODEL not set");

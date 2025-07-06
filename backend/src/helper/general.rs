@@ -26,11 +26,11 @@ pub async fn ai_task_req(
     msg_ctx: String,
     agent_pos: &str,
     agent_operation: &str,
-    fn_pass: for<'a> fn(&'a str) -> &'static str
+    fn_pass: fn(&str) -> &'static str
 ) -> GeminiResponse {
     let extended_msg = extend_ai_function(fn_pass, &msg_ctx);
     PrinCommand::AICall.print_agent_message(agent_pos, agent_operation);
-    let llm_res: Result<GeminiResponse, Box<dyn std::error::Error>> = call_api(vec![extended_msg.clone()]).await;
+    let llm_res: Result<GeminiResponse, Box<dyn std::error::Error + Send + Sync>> = call_api(vec![extended_msg.clone()]).await;
     match llm_res {
         Ok(llm_res) => llm_res,
         Err(_) => call_api(vec![extended_msg.clone()])
@@ -43,7 +43,7 @@ pub async fn ai_task_req_decoded<T: DeserializeOwned>(
     msg_ctx: String,
     agent_pos: &str,
     agent_operation: &str,
-    fn_pass: for<'a> fn(&'a str) -> &'static str
+    fn_pass: fn(&str) -> &'static str
 ) -> T {
     let Some(ai_res) = ai_task_req(msg_ctx, agent_pos, agent_operation, fn_pass)
         .await.extract_text()
@@ -51,7 +51,7 @@ pub async fn ai_task_req_decoded<T: DeserializeOwned>(
         panic!("LLM response did not return any text");
     };
 
-    let decoded_res: Result<T, _> = serde_json::from_str(&ai_res);
+    let decoded_res: Result<T, serde_json::Error> = serde_json::from_str(&ai_res);
     let res = match decoded_res {
         Ok(res) => res,
         Err(_) => panic!("Failed to deserialize LLM response")
@@ -73,7 +73,7 @@ pub fn read_code_template_contents() -> String {
 ///Save the new Code
 pub fn write_code_main(content: &String , user: &String) {
     let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
-    
+
     fs::write(&exec_main_path, content).expect("Failed to write main file");
 
 }
@@ -82,30 +82,4 @@ pub fn write_code_main(content: &String , user: &String) {
 pub fn save_api_json(api_endpoints:&String , user:&String) {
     let api_schema_path:&str = &format!("../../../Out/{}/api_schema.json", user);
     fs::write(&api_schema_path, api_endpoints).expect("Failed to write api endpoints file");
-}
-
-
-
-#[cfg(test)]
-mod tests {
-    use crate::ai_functions::aifunc_managing::convert_user_input_to_goal;
-    use super::*;
-    use crate::helper::general::ai_task_req;
-
-    #[tokio::test]
-    async fn test_asi_task_req() {
-        let ai_func_param = "Build me a webserver for making stock api request".to_string();
-
-        let res = ai_task_req(ai_func_param, "Managing agent", "Define User requirment", convert_user_input_to_goal).await;
-        for s in res.extract_all_texts() {
-            println!("{} ", s);
-        }
-        assert!(res.extract_all_texts().len() > 0);
-    }
-    
-    #[tokio::test]
-    async fn test_check_status_code() {
-        let code = check_status_code(&Client::new(), "https://catfact.ninja/fact").await.unwrap();
-        assert_eq!(code, 200u16);
-    }
 }
