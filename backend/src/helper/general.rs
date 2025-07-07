@@ -45,11 +45,12 @@ pub async fn ai_task_req_decoded<T: DeserializeOwned>(
     agent_operation: &str,
     fn_pass: fn(&str) -> &'static str
 ) -> T {
-    let Some(ai_res) = ai_task_req(msg_ctx, agent_pos, agent_operation, fn_pass)
-        .await.extract_text()
-    else {
-        panic!("LLM response did not return any text");
+    let response = ai_task_req(msg_ctx, agent_pos, agent_operation, fn_pass).await;
+    let Some(ai_res) = response.get_string() else {
+        panic!("LLM gave no text");
     };
+
+    dbg!(ai_res.clone());
 
     let decoded_res: Result<T, serde_json::Error> = serde_json::from_str(&ai_res);
     let res = match decoded_res {

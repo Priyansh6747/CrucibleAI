@@ -17,7 +17,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let msg = vec![GeminiContent::new("user".to_string(),res)];
 
     // Call the API and handle the result
-    let out = api::call_req::call_api(msg).await?;
+    let out = match api::call_req::call_api(msg).await { 
+        Ok(o) => o,
+        Err(e) => panic!("{}", e),
+    };
     for s in out.extract_all_texts() {
         println!("{} ", s);
     }

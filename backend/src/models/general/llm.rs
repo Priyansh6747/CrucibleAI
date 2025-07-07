@@ -125,12 +125,17 @@ impl GeminiResponse {
         texts
     }
     
-    pub fn get_string(&self) ->String {
+    pub fn get_string(&self) ->Option<String> {
         let mut out:String = String::new();
         for s in self.extract_all_texts() {
             out.push_str(&s);
             out.push(' ');
         }
-        out
+        let cleaned = out.trim()
+                                .trim_start_matches("```json")
+                                .trim_start_matches("```")
+                                .trim_end_matches("```")
+            .trim();
+        Some(cleaned.to_string())
     }
 }

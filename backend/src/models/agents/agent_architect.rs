@@ -1,10 +1,12 @@
-use std::error::Error;
-use async_trait::async_trait;
 use crate::ai_functions::aifunc_architect::{print_project_scope, print_site_urls};
-use crate::helper::general::{ai_task_req, ai_task_req_decoded};
+use crate::helper::command_line::PrinCommand;
+use crate::helper::general::{ai_task_req_decoded, check_status_code};
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agent_basic::basic_traits::BasicTrait;
 use crate::models::agents::agent_traits::{FactSheet, ProjectScope, SpecialFunction};
+use async_trait::async_trait;
+use std::error::Error;
+use std::time::Duration;
 
 #[derive(Debug)]
 pub struct AgentSolutionrAchitect{
@@ -58,10 +60,44 @@ impl SpecialFunction for AgentSolutionrAchitect {
         while self.attribute.state != AgentState::Finished {
             match self.attribute.state {
                 AgentState::Discovery => {
-                    let _p = self.call_project_scope(factsheet).await;
+                    let project_scope = self.call_project_scope(factsheet).await;
+                    if project_scope.is_external_urls_required {
+                        self.call_determine_external_url(factsheet,factsheet.project_disc.clone()).await;
+                        self.attribute.state = AgentState::UnitTesting;
+                    }
                 }
                 AgentState::UnitTesting => {
-                    todo!()
+                    let mut exclude_url:Vec<String> = Vec::new();
+                    let client = reqwest::Client::builder()
+                        .timeout(Duration::from_secs(5))
+                        .build()
+                        .unwrap();
+
+                    let urls = factsheet.external_urls.as_ref()
+                        .expect("No URL object on factsheet");
+
+                    for url in urls {
+                        let endpoint = format!("Testing URL {}", url);
+                        PrinCommand::UnitTest.print_agent_message(self.attribute.position.as_str(), endpoint.as_str());
+                        match check_status_code(&client,url).await {
+                            Ok(status_code) => {
+                                if status_code != 200 {
+                                    exclude_url.push(url.clone());
+                                }
+                            }
+                            Err(e) => {
+                                println!("Error Checking: {} {}", url, e);
+                            }
+                        }
+                    };
+                    if exclude_url.len() > 0 {
+                        let new_urls:Vec<String> = factsheet.external_urls.as_ref().unwrap().iter()
+                            .filter(|url| !exclude_url.contains(url))
+                            .cloned().collect();
+                        factsheet.external_urls = Some(new_urls);
+                    }
+
+                    self.attribute.update_state(AgentState::Finished);
                 }
                 _ => {
                     self.attribute.state = AgentState::Finished;
@@ -73,36 +109,23 @@ impl SpecialFunction for AgentSolutionrAchitect {
     }
 }
 
-// Add this to your code to systematically check what's not Send
-use std::marker::Send;
 
-// Test each type individually
-fn assert_send<T: Send>() {}
-fn assert_sync<T: Sync>() {}
-
-#[test]
-fn debug_send_types() {
-    // Test your basic types
-    assert_send::<FactSheet>();
-    assert_send::<AgentSolutionrAchitect>();
-    assert_send::<BasicAgent>();
-    assert_send::<AgentState>();
-    assert_send::<ProjectScope>();
-
-    // Test the function types
-    assert_send::<fn(&str) -> &'static str>();
-    
-
-    
-}
-
-#[tokio::test]
-async fn test_send_across_threads() {
-    let mut agent = AgentSolutionrAchitect::new();
-    let mut factsheet = FactSheet::default(); // Assuming it has Default
-
-    // This should fail if not Send
-    tokio::spawn(async move {
-        let _ = agent.execute(&mut factsheet).await;
-    });
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[tokio::test]
+    async fn test_sol_architect(){
+        let mut architect = AgentSolutionrAchitect::new();
+        let mut fact = FactSheet{
+            project_disc: "Build a stock website with user login and logout that shows lates forex prices".to_string(),
+            project_scope: None,
+            external_urls: None,
+            backend_code: None,
+            api_endpoint_schema:None
+        };
+        architect.execute(&mut fact).await.expect("Unable to execute");
+        assert!(fact.project_scope.is_some());
+        assert!(fact.external_urls.is_some());
+        dbg!(fact);
+    }
 }
