@@ -49,9 +49,6 @@ pub async fn ai_task_req_decoded<T: DeserializeOwned>(
     let Some(ai_res) = response.get_string() else {
         panic!("LLM gave no text");
     };
-
-    dbg!(ai_res.clone());
-
     let decoded_res: Result<T, serde_json::Error> = serde_json::from_str(&ai_res);
     let res = match decoded_res {
         Ok(res) => res,
@@ -71,8 +68,12 @@ pub fn read_code_template_contents() -> String {
     fs::read_to_string(&path).expect("Failed to read template file")
 }
 
+pub fn read_exec_main_contents(user: &str) -> String {
+    let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
+    fs::read_to_string(&exec_main_path).expect("Failed to read main file")
+}
 ///Save the new Code
-pub fn write_code_main(content: &String , user: &String) {
+pub fn save_backend_code(content: &String , user: &str) {
     let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
 
     fs::write(&exec_main_path, content).expect("Failed to write main file");
