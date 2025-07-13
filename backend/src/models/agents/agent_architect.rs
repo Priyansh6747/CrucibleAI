@@ -5,7 +5,6 @@ use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agent_basic::basic_traits::BasicTrait;
 use crate::models::agents::agent_traits::{FactSheet, ProjectScope, SpecialFunction};
 use async_trait::async_trait;
-use std::error::Error;
 use std::time::Duration;
 
 #[derive(Debug)]

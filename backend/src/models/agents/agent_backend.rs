@@ -1,5 +1,5 @@
 use crate::ai_functions::aifunc_backend::{print_backend_webserver_code, print_fixed_code, print_improved_webserver_code, print_rest_api_endpoints};
-use crate::helper::general::{ai_task_req, read_exec_main_contents, save_backend_code};
+use crate::helper::general::{ai_task_req, read_code_template_contents, read_exec_main_contents, save_backend_code};
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agent_basic::basic_traits::BasicTrait;
 use crate::models::agents::agent_traits::{FactSheet, RouteObject, SpecialFunction};
@@ -31,8 +31,9 @@ impl AgentBackendDeveloper {
     }
 
     async fn call_initial_backend_code(&mut self ,fact_sheet: &mut FactSheet) {
+        let code_template_str: String = read_code_template_contents();
         let msg_ctx = format!("Code template: {:?} Project Discription {:?}",
-                                        fact_sheet.backend_code,fact_sheet);
+                                        code_template_str,fact_sheet);
         let ai_res = ai_task_req(
             msg_ctx,
             "Backend Developer",
@@ -119,7 +120,7 @@ impl SpecialFunction for AgentBackendDeveloper {
 
                     let build_backend_server= Command::new("cargo")
                         .arg("build")
-                        .current_dir("Out/user1")
+                        .current_dir("Out/user1/")
                         .stdout(Stdio::piped())
                         .stderr(Stdio::piped())
                         .output().expect("Failed to execute build command");

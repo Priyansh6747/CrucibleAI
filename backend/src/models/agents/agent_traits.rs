@@ -1,8 +1,7 @@
-use crate::models::agent_basic::basic_agent;
-use async_trait::async_trait;
-use serde::{ Serialize, Deserialize };
-use std::fmt::Debug;
 use crate::models::agent_basic::basic_agent::BasicAgent;
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 #[derive(Deserialize, Serialize, Debug, Clone,PartialEq)]
 pub struct RouteObject {
@@ -32,16 +31,4 @@ pub struct FactSheet{
 pub trait SpecialFunction: Debug {
     fn get_attribute_from_agent(&self) -> &BasicAgent;
     async fn execute(&mut self, factsheet: &mut FactSheet) -> Result<(), Box<dyn std::error::Error + Send + Sync>> ;
-}
-
-impl FactSheet {
-    pub(crate) fn default() -> FactSheet {
-        FactSheet{
-            project_disc: "Test".to_string(),
-            project_scope: None,
-            external_urls: None,
-            backend_code: None,
-            api_endpoint_schema: None,
-        }
-    }
 }

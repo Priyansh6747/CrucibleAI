@@ -1,9 +1,8 @@
-use std::io::{stdin, stdout};
 use crossterm::{
-    style::{Color, SetForegroundColor,ResetColor },
+    style::{Color, ResetColor, SetForegroundColor},
     ExecutableCommand
 };
-use crossterm::style::Print;
+use std::io::{stdin, stdout};
 
 pub fn get_user_response(question: &str) -> String {
     let mut stdout = stdout();

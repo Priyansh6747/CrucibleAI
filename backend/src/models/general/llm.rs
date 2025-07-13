@@ -1,5 +1,4 @@
-use serde::{Serialize, Deserialize};
-use serde_json::Value;
+use serde::{Deserialize, Serialize};
 
 ///Request Bases Structures
 #[derive(Serialize, Deserialize, Debug, Clone ,PartialEq)]
@@ -80,29 +79,6 @@ pub struct SafetyRating {
 }
 
 impl GeminiResponse {
-    /// Parse JSON response into GeminiResponse struct
-    pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(json_str)
-    }
-
-    /// Parse from serde_json::Value
-    pub fn from_value(value: Value) -> Result<Self, serde_json::Error> {
-        serde_json::from_value(value)
-    }
-
-    /// Extract the first generated text from the response
-    pub fn extract_text(&self) -> Option<String> {
-        self.candidates
-            .as_ref()?
-            .first()?
-            .content
-            .as_ref()?
-            .parts
-            .as_ref()?
-            .first()?
-            .text
-            .clone()
-    }
 
     /// Extract all generated texts from all candidates
     pub fn extract_all_texts(&self) -> Vec<String> {

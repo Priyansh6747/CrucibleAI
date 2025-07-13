@@ -1,9 +1,9 @@
-use crate::ai_functions::aifunc_architect::print_project_scope;
 use crate::ai_functions::aifunc_managing::convert_user_input_to_goal;
-use crate::helper::general::{ai_task_req, ai_task_req_decoded};
+use crate::helper::general::{ai_task_req, save_api_json};
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agents::agent_architect::AgentSolutionrAchitect;
-use crate::models::agents::agent_traits::{FactSheet, ProjectScope, SpecialFunction};
+use crate::models::agents::agent_backend::AgentBackendDeveloper;
+use crate::models::agents::agent_traits::{FactSheet, SpecialFunction};
 
 pub struct ManagingAgent {
     attribute: BasicAgent,
@@ -27,7 +27,7 @@ impl ManagingAgent {
         ).await.get_string().unwrap();
 
         let agents: Vec<Box<dyn SpecialFunction>> = vec![];
-        let mut factsheet = FactSheet{
+        let factsheet = FactSheet{
             project_disc,
             project_scope: None,
             external_urls: None,
@@ -47,7 +47,7 @@ impl ManagingAgent {
     }
     fn create_agents(&mut self){
         self.add_agent(Box::new(AgentSolutionrAchitect::new()));
-        
+        self.add_agent(Box::new(AgentBackendDeveloper::new()))
     }
     
     pub async fn execute_project(&mut self){
@@ -57,6 +57,9 @@ impl ManagingAgent {
             let agent_info = agent.get_attribute_from_agent();
             dbg!(agent_info);
         }
+        let api_schema_str = serde_json::to_string(&self.factsheet.api_endpoint_schema)
+            .expect("Could not serialize api schema");
+        save_api_json(&api_schema_str, "user1");
     }
 }
 
