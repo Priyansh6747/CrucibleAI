@@ -2,9 +2,11 @@ use crate::ai_functions::aifunc_backend::{print_backend_webserver_code, print_fi
 use crate::helper::general::{ai_task_req, read_exec_main_contents, save_backend_code};
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
 use crate::models::agent_basic::basic_traits::BasicTrait;
-use crate::models::agents::agent_traits::{FactSheet, SpecialFunction};
+use crate::models::agents::agent_traits::{FactSheet, RouteObject, SpecialFunction};
+use crate::helper::command_line::PrinCommand;
 use async_trait::async_trait;
 use std::error::Error;
+use std::process::{Command, Stdio};
 
 #[derive(Debug)]
 pub struct AgentBackendDeveloper {
@@ -103,14 +105,86 @@ impl SpecialFunction for AgentBackendDeveloper {
                     continue;
                 }
                 AgentState::Working => {
-                    if self.bug_count == 0 {}
+                    if self.bug_count == 0 {
+                        self.call_improved_backend_code(factsheet).await;
+                    }else {
+                        self.call_fix_code_bugs(factsheet).await;
+                    }
+                    self.attribute.update_state(AgentState::UnitTesting);
+                    continue;
                 }
                 AgentState::UnitTesting => {
-                    todo!()
+                    PrinCommand::UnitTest.print_agent_message(self.attribute.position.as_str(),
+                    "Backend Code Unit Testing: building project...");
+
+                    let build_backend_server= Command::new("cargo")
+                        .arg("build")
+                        .current_dir("Out/user1")
+                        .stdout(Stdio::piped())
+                        .stderr(Stdio::piped())
+                        .output().expect("Failed to execute build command");
+                    
+                    if build_backend_server.status.success() {
+                       self.bug_count=0;
+                       PrinCommand::UnitTest.print_agent_message(self.attribute.position.as_str(),
+                                                                  "Backend Code Unit Testing: Test server build successful.");
+                    }else { 
+                        let error_arr = build_backend_server.stderr;
+                        let error_str = String::from_utf8(error_arr).unwrap();
+                        
+                        self.bug_count +=1;
+                        self.bug_error = Some(error_str);
+                        
+                        if self.bug_count >= 2 {
+                            PrinCommand::Issue.print_agent_message(self.attribute.position.as_str(),
+                                                                      "Backend Code Unit Testing: Too many bugs process dumped");
+                            panic!("Too many bugs process dumped");
+                        }
+                        self.attribute.update_state(AgentState::Working);
+                    }
+                    
+                    let api_endpoint_str = self.call_extract_rest_api_endpoints().await;
+                    let api_endpoint: Vec<RouteObject> = serde_json::from_str(&api_endpoint_str)
+                        .expect("Failed to parse API endpoint");
+                    factsheet.api_endpoint_schema = Some(api_endpoint);
+                    
+                    self.attribute.update_state(AgentState::Finished);
                 }
+                
+                
                 _ => {}
             }
         }
         Ok(())
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_write_backend_code() {
+        let mut agent_backend = AgentBackendDeveloper::new();
+        let factsheet_str: &str = r#"
+            {
+              "project_disc": "Build a stock website with user login and logout that shows lates forex prices",
+              "project_scope": {
+                "is_crud_required": true,
+                "is_user_login_and_logout": true,
+                "is_external_urls_required": true
+              },
+              "external_urls": [
+                "https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=1min&apikey=YOUR_API_KEY",
+                "https://api.twelvedata.com/quote?symbol=EUR/USD&apikey=YOUR_API_KEY"
+              ],
+              "backend_code": null,
+              "api_endpoint_schema": null
+            }
+            "#;
+
+        let mut factsheet:FactSheet = serde_json::from_str(factsheet_str).unwrap();
+        agent_backend.execute(&mut factsheet).await.unwrap();
     }
 }

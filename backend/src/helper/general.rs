@@ -5,7 +5,7 @@ use crate::api::call_req::call_api;
 use crate::helper::command_line::PrinCommand;
 use crate::models::general::llm::{GeminiContent, GeminiResponse};
 
-const CODE_TEMPLATE_PATH: &str = "../../../Template/ServerTemplate.rs";
+const CODE_TEMPLATE_PATH: &str = "Template/ServerTemplate.rs";
 
 pub fn extend_ai_function(ai_func: fn(&str) -> &'static str, func_input: &str) -> GeminiContent {
     let ai_function_str: &str = ai_func(func_input);
@@ -69,12 +69,12 @@ pub fn read_code_template_contents() -> String {
 }
 
 pub fn read_exec_main_contents(user: &str) -> String {
-    let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
+    let exec_main_path: &str =  &format!("Out/{}/main.rs", user);
     fs::read_to_string(&exec_main_path).expect("Failed to read main file")
 }
 ///Save the new Code
 pub fn save_backend_code(content: &String , user: &str) {
-    let exec_main_path: &str =  &format!("../../../Out/{}/main.rs", user);
+    let exec_main_path: &str =  &format!("Out/{}/main.rs", user);
 
     fs::write(&exec_main_path, content).expect("Failed to write main file");
 
